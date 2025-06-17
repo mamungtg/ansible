@@ -1,0 +1,46 @@
+---
+- name: Install SSL for Elasticsearch
+  hosts: elasticsearch
+  become: yes
+  vars:
+    cert_dir: /etc/elasticsearch/certs
+    cert_file: "{{ cert_dir }}/elasticsearch.crt"
+    key_file: "{{ cert_dir }}/elasticsearch.key"
+  tasks:
+    - name: Ensure openssl is installed
+      package:
+        name: openssl
+        state: present
+
+    - name: Create certificate directory
+      file:
+        path: "{{ cert_dir }}"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Generate private key
+      command: openssl genrsa -out "{{ key_file }}" 2048
+      args:
+        creates: "{{ key_file }}"
+
+    - name: Generate self-signed certificate
+      command: >
+        openssl req -new -x509 -key "{{ key_file }}" -out "{{ cert_file }}" -days 365 -subj "/CN={{ ansible_fqdn }}"
+      args:
+        creates: "{{ cert_file }}"
+
+    - name: Configure Elasticsearch SSL
+      blockinfile:
+        path: /etc/elasticsearch/elasticsearch.yml
+        block: |
+          xpack.security.http.ssl.enabled: true
+          xpack.security.http.ssl.key: "{{ key_file }}"
+          xpack.security.http.ssl.certificate: "{{ cert_file }}"
+        insertafter: EOF
+
+    - name: Restart Elasticsearch
+      service:
+        name: elasticsearch
+        state: restarted
