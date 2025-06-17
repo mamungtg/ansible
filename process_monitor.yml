@@ -1,0 +1,20 @@
+---
+- name: Monitor critical processes
+  hosts: all
+  gather_facts: no
+  vars:
+    processes:
+      - sshd
+      - nginx
+  tasks:
+    - name: Check if process is running
+      shell: pgrep -fl "{{ item }}"
+      register: process_status
+      changed_when: false
+      failed_when: false
+      loop: "{{ processes }}"
+
+    - name: Report process status
+      debug:
+        msg: "{{ item.item }} is {{ 'running' if item.rc == 0 else 'NOT running' }}"
+      loop: "{{ process_status.results }}"
