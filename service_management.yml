@@ -1,3 +1,61 @@
+ (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
+diff --git a/README.md b/README.md
+index 7b563ca42f6f7f832616275580400f56c0ab9fb5..7fd9c2a14df05560076003eea4f6b81066942ce8 100644
+--- a/README.md
++++ b/README.md
+@@ -27,25 +27,49 @@ The `disk_monitor.yml` playbook checks a host's disk usage and sends alerts when
+    - Write a warning to the chosen log file.
+ 
+ ### Example Inventory
+ ```ini
+ [servers]
+ server1.example.com
+ server2.example.com
+ ```
+ 
+ ### Automating with Cron
+ To check disks every hour, create a cron job:
+ ```bash
+ 0 * * * * ansible-playbook -i /path/to/inventory /path/to/disk_monitor.yml
+ ```
+ 
+ ## User Management
+ 
+ The `user_management.yml` playbook creates or removes user accounts and sets up groups, passwords, and SSH keys.
+ 
+ ### Usage
+ 1. Edit the variables at the top of `user_management.yml` to define the account name, groups, password, and SSH key.
+ 2. Run the playbook:
+    ```bash
+    ansible-playbook -i inventory user_management.yml
+    ```
++
++## Service Management
++
++The `service_management.yml` playbook starts, stops, enables, or disables
++services on target hosts.
++
++### Usage
++1. Edit the `services` list in `service_management.yml` to define each
++   service name, desired state, and whether it should be enabled at boot.
++2. Run the playbook:
++   ```bash
++   ansible-playbook -i inventory service_management.yml
++   ```
++
++Example structure for `services`:
++```yaml
++services:
++  - name: nginx
++    state: started
++    enabled: true
++  - name: sshd
++    state: stopped
++    enabled: false
++```
+ 
+EOF
+)
 ---
 - name: Manage system services
   hosts: all
