@@ -97,3 +97,16 @@ The `system_baseline_audit.yml` playbook collects basic system information and a
    ```bash
    ansible-playbook -i inventory system_baseline_audit.yml
    ```
+
+
+## Process Monitoring
+
+The `process_monitor.yml` playbook verifies that specified processes are running on your hosts.
+
+### Usage
+1. Edit the `processes` list in `process_monitor.yml` with the names of processes you want to monitor.
+2. Run the playbook:
+   ```bash
+   ansible-playbook -i inventory process_monitor.yml
+   ```
+
