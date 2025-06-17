@@ -49,3 +49,27 @@ The `user_management.yml` playbook creates or removes user accounts and sets up 
    ```bash
    ansible-playbook -i inventory user_management.yml
    ```
+
+## Service Management
+
+The `service_management.yml` playbook starts, stops, enables, or disables
+services on target hosts.
+
+### Usage
+1. Edit the `services` list in `service_management.yml` to define each
+   service name, desired state, and whether it should be enabled at boot.
+2. Run the playbook:
+   ```bash
+   ansible-playbook -i inventory service_management.yml
+   ```
+
+Example structure for `services`:
+```yaml
+services:
+  - name: nginx
+    state: started
+    enabled: true
+  - name: sshd
+    state: stopped
+    enabled: false
+```
