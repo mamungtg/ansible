@@ -1,0 +1,16 @@
+---
+- name: Manage system services
+  hosts: all
+  become: yes
+  vars:
+    services:
+      - name: nginx
+        state: started
+        enabled: true
+  tasks:
+    - name: Manage services
+      service:
+        name: "{{ item.name }}"
+        state: "{{ item.state }}"
+        enabled: "{{ item.enabled | default(omit) }}"
+      loop: "{{ services }}"
