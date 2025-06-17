@@ -1,0 +1,31 @@
+---
+- name: Manage users and groups
+  hosts: all
+  become: yes
+  vars:
+    username: example
+    groups:
+      - developers
+    state: present  # use 'absent' to remove
+    password: "{{ 'securepassword' | password_hash('sha512') }}"
+    ssh_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC...user@example"
+  tasks:
+    - name: Ensure groups exist
+      group:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ groups }}"
+
+    - name: Manage user account
+      user:
+        name: "{{ username }}"
+        groups: "{{ groups | join(',') }}"
+        state: "{{ state }}"
+        password: "{{ password }}"
+
+    - name: Set authorized SSH key for the user
+      authorized_key:
+        user: "{{ username }}"
+        state: present
+        key: "{{ ssh_key }}"
+      when: state == 'present'

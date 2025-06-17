@@ -38,3 +38,14 @@ To check disks every hour, create a cron job:
 ```bash
 0 * * * * ansible-playbook -i /path/to/inventory /path/to/disk_monitor.yml
 ```
+
+## User Management
+
+The `user_management.yml` playbook creates or removes user accounts and sets up groups, passwords, and SSH keys.
+
+### Usage
+1. Edit the variables at the top of `user_management.yml` to define the account name, groups, password, and SSH key.
+2. Run the playbook:
+   ```bash
+   ansible-playbook -i inventory user_management.yml
+   ```
