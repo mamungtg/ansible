@@ -1,0 +1,53 @@
+---
+- name: Monitor disk usage
+  hosts: all
+  gather_facts: yes
+  vars:
+    disk: "/"
+    threshold: 80
+    email_to: "admin@example.com"
+    email_from: "monitor@example.com"
+    smtp_host: "smtp.example.com"
+    smtp_port: 25
+    slack_token: "YOUR_SLACK_TOKEN"
+    slack_channel: "#alerts"
+    log_file: "/var/log/disk_usage_alerts.log"
+
+  tasks:
+    - name: Get disk usage
+      command: "df -P {{ disk }} | tail -1 | awk '{print $5}'"
+      register: df_out
+      changed_when: false
+
+    - name: Set usage percent
+      set_fact:
+        usage_percent: "{{ df_out.stdout.rstrip('%') | int }}"
+
+    - name: Debug usage
+      debug:
+        msg: "Disk usage on {{ disk }} is {{ usage_percent }}%"
+
+    - name: Send email alert if threshold exceeded
+      mail:
+        host: "{{ smtp_host }}"
+        port: "{{ smtp_port }}"
+        to: "{{ email_to }}"
+        from: "{{ email_from }}"
+        subject: "Disk usage alert on {{ inventory_hostname }}"
+        body: "Disk usage on {{ disk }} is {{ usage_percent }}%, exceeding threshold of {{ threshold }}%."
+      when: usage_percent > threshold
+
+    - name: Send Slack notification if threshold exceeded
+      community.general.slack:
+        token: "{{ slack_token }}"
+        channel: "{{ slack_channel }}"
+        msg: "Disk usage on {{ inventory_hostname }} {{ disk }} is {{ usage_percent }}% (threshold {{ threshold }}%)."
+      when: usage_percent > threshold
+
+    - name: Write warning to log file
+      lineinfile:
+        path: "{{ log_file }}"
+        create: yes
+        line: "{{ ansible_date_time.iso8601 }} {{ inventory_hostname }} {{ disk }} usage {{ usage_percent }}%"
+      when: usage_percent > threshold
+      delegate_to: localhost
