@@ -1,0 +1,17 @@
+---
+- name: Collect and log system baseline information
+  hosts: all
+  gather_facts: yes
+  vars:
+    log_file: /var/log/system_baseline.log
+  tasks:
+    - name: Compose baseline log entry
+      set_fact:
+        baseline_entry: "{{ ansible_date_time.iso8601 }} hostname={{ ansible_fqdn }} os={{ ansible_distribution }} {{ ansible_distribution_version }} kernel={{ ansible_kernel }} uptime={{ ansible_uptime_seconds }}s"
+
+    - name: Append baseline entry to log file
+      lineinfile:
+        path: "{{ log_file }}"
+        create: yes
+        line: "{{ baseline_entry }}"
+      delegate_to: localhost

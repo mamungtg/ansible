@@ -86,3 +86,14 @@ security patches on target hosts. It can reboot machines when required.
    ```bash
    ansible-playbook -i inventory system_update.yml
    ```
+
+## System Baseline Audit
+
+The `system_baseline_audit.yml` playbook collects basic system information and appends it to a log file. The entry includes hostname, operating system version, kernel release, and system uptime.
+
+### Usage
+1. Adjust the `log_file` variable in the playbook if a different log location is desired.
+2. Run the playbook:
+   ```bash
+   ansible-playbook -i inventory system_baseline_audit.yml
+   ```
