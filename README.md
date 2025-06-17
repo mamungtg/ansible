@@ -73,3 +73,16 @@ services:
     state: stopped
     enabled: false
 ```
+
+## System Updates
+
+The `system_update.yml` playbook installs the latest package updates and
+security patches on target hosts. It can reboot machines when required.
+
+### Usage
+1. Set the `reboot` variable to `true` if you want hosts to reboot after
+   applying updates when a reboot is needed.
+2. Run the playbook:
+   ```bash
+   ansible-playbook -i inventory system_update.yml
+   ```
