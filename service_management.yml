@@ -1,4 +1,3 @@
- (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
 diff --git a/README.md b/README.md
 index 7b563ca42f6f7f832616275580400f56c0ab9fb5..7fd9c2a14df05560076003eea4f6b81066942ce8 100644
 --- a/README.md
@@ -53,22 +52,3 @@ index 7b563ca42f6f7f832616275580400f56c0ab9fb5..7fd9c2a14df05560076003eea4f6b810
 +    state: stopped
 +    enabled: false
 +```
- 
-EOF
-)
----
-- name: Manage system services
-  hosts: all
-  become: yes
-  vars:
-    services:
-      - name: nginx
-        state: started
-        enabled: true
-  tasks:
-    - name: Manage services
-      service:
-        name: "{{ item.name }}"
-        state: "{{ item.state }}"
-        enabled: "{{ item.enabled | default(omit) }}"
-      loop: "{{ services }}"
