@@ -1,0 +1,24 @@
+---
+- name: Perform system baseline audit
+  hosts: all
+  gather_facts: yes
+  vars:
+    log_file: /var/log/system_baseline_audit.log
+  tasks:
+    - name: Collect uptime
+      command: uptime -p
+      register: uptime_result
+      changed_when: false
+
+    - name: Collect kernel version
+      command: uname -r
+      register: kernel_result
+      changed_when: false
+
+    - name: Log baseline information
+      lineinfile:
+        path: "{{ log_file }}"
+        create: yes
+        line: "{{ ansible_date_time.iso8601 }} {{ inventory_hostname }} OS: {{ ansible_distribution }} {{ ansible_distribution_version }} Kernel: {{ kernel_result.stdout }} Uptime: {{ uptime_result.stdout }}"
+      delegate_to: localhost
+      become: false
